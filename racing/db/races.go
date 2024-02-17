@@ -80,6 +80,12 @@ func (r *racesRepo) applyFilter(query string, filter *racing.ListRacesRequestFil
 		}
 	}
 
+	if filter.Visibility == racing.ListRacesRequestFilter_VISIBILE {
+		clauses = append(clauses, "visible = true")
+	} else if filter.Visibility == racing.ListRacesRequestFilter_HIDDEN {
+		clauses = append(clauses, "visible = false")
+	}
+
 	if len(clauses) != 0 {
 		query += " WHERE " + strings.Join(clauses, " AND ")
 	}
