@@ -88,20 +88,20 @@ func (r *racesRepo) applyFilter(query string, filter *racing.ListRacesRequestFil
 
 	if len(clauses) != 0 {
 		query += " WHERE " + strings.Join(clauses, " AND ")
+	}
 
-		// add sort and order clause in the end
-		if filter.SortBy != "" {
-			// check for valid fields
-			if filter.SortBy == "advertised_start_time" || filter.SortBy == "number" ||
-				filter.SortBy == "meeting_id" || filter.SortBy == "name" {
-				sortCondition := " ORDER BY " + filter.SortBy
-				query += sortCondition
-			}
+	// add sort and order clause in the end
+	if filter.SortBy != "" {
+		// check for valid fields
+		if filter.SortBy == "advertised_start_time" || filter.SortBy == "number" ||
+			filter.SortBy == "meeting_id" || filter.SortBy == "name" {
+			sortCondition := " ORDER BY " + filter.SortBy
+			query += sortCondition
+
+			if filter.OrderBy == 1 {
+				query += " DESC"
+			} // note - we don't need to check for 0 since by default the sort order is ASC
 		}
-
-		if filter.OrderBy == 1 {
-			query += " DESC"
-		} // note - we don't need to check for 0 since by default the sort order is ASC
 	}
 
 	return query, args
@@ -130,6 +130,11 @@ func (m *racesRepo) scanRaces(
 		}
 
 		race.AdvertisedStartTime = ts
+		if race.AdvertisedStartTime.AsTime().Before(time.Now()) {
+			race.Status = "CLOSED"
+		} else {
+			race.Status = "OPEN"
+		}
 
 		races = append(races, &race)
 	}
