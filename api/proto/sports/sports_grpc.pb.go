@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion7
 
 const (
 	Sports_ListEvents_FullMethodName = "/sports.Sports/ListEvents"
+	Sports_GetEvent_FullMethodName   = "/sports.Sports/GetEvent"
 )
 
 // SportsClient is the client API for Sports service.
@@ -28,6 +29,8 @@ const (
 type SportsClient interface {
 	// ListEvents returns a list of all races.
 	ListEvents(ctx context.Context, in *ListEventsRequest, opts ...grpc.CallOption) (*ListEventsResponse, error)
+	// GetEvent returns a single Event based on the given ID.
+	GetEvent(ctx context.Context, in *GetEventRequest, opts ...grpc.CallOption) (*Event, error)
 }
 
 type sportsClient struct {
@@ -47,12 +50,23 @@ func (c *sportsClient) ListEvents(ctx context.Context, in *ListEventsRequest, op
 	return out, nil
 }
 
+func (c *sportsClient) GetEvent(ctx context.Context, in *GetEventRequest, opts ...grpc.CallOption) (*Event, error) {
+	out := new(Event)
+	err := c.cc.Invoke(ctx, Sports_GetEvent_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // SportsServer is the server API for Sports service.
 // All implementations must embed UnimplementedSportsServer
 // for forward compatibility
 type SportsServer interface {
 	// ListEvents returns a list of all races.
 	ListEvents(context.Context, *ListEventsRequest) (*ListEventsResponse, error)
+	// GetEvent returns a single Event based on the given ID.
+	GetEvent(context.Context, *GetEventRequest) (*Event, error)
 	mustEmbedUnimplementedSportsServer()
 }
 
@@ -62,6 +76,9 @@ type UnimplementedSportsServer struct {
 
 func (UnimplementedSportsServer) ListEvents(context.Context, *ListEventsRequest) (*ListEventsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListEvents not implemented")
+}
+func (UnimplementedSportsServer) GetEvent(context.Context, *GetEventRequest) (*Event, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetEvent not implemented")
 }
 func (UnimplementedSportsServer) mustEmbedUnimplementedSportsServer() {}
 
@@ -94,6 +111,24 @@ func _Sports_ListEvents_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Sports_GetEvent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetEventRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SportsServer).GetEvent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Sports_GetEvent_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SportsServer).GetEvent(ctx, req.(*GetEventRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Sports_ServiceDesc is the grpc.ServiceDesc for Sports service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -104,6 +139,10 @@ var Sports_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListEvents",
 			Handler:    _Sports_ListEvents_Handler,
+		},
+		{
+			MethodName: "GetEvent",
+			Handler:    _Sports_GetEvent_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

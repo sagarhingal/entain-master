@@ -11,6 +11,12 @@ service Sports {
   rpc ListEvents(ListEventsRequest) returns (ListEventsResponse) {
     option (google.api.http) = { post: "/v1/list-events", body: "*" };
   }
+
+  // GetEvent returns a single Event based on the given ID.
+  rpc GetEvent(GetEventRequest) returns (Event) {
+    option (google.api.http) = { post: "/v1/event/{id}"};
+  }
+
 }
 
 /* Requests/Responses */
@@ -22,6 +28,10 @@ message ListEventsRequest {
 // Response to ListEvents call.
 message ListEventsResponse {
   repeated Event events = 1;
+}
+
+message GetEventRequest {
+  int32 id = 1;
 }
 
 // Filter for listing events.

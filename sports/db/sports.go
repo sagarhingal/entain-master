@@ -2,6 +2,8 @@ package db
 
 import (
 	"database/sql"
+	"fmt"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -18,6 +20,9 @@ type SportsRepo interface {
 
 	// List will return a list of events.
 	List(filter *sports.ListEventsRequestFilter) ([]*sports.Event, error)
+
+	// Get will return a single event based on the given ID.
+	Get(filter *sports.GetEventRequest) (*sports.Event, error)
 }
 
 type sportsRepo struct {
@@ -58,7 +63,37 @@ func (r *sportsRepo) List(filter *sports.ListEventsRequestFilter) ([]*sports.Eve
 		return nil, err
 	}
 
-	return r.scanRaces(rows)
+	return r.scanEvents(rows)
+}
+
+func (r *sportsRepo) Get(filter *sports.GetEventRequest) (*sports.Event, error) {
+	var (
+		err   error
+		query string
+	)
+
+	query = getSportsQueries()[sportsList]
+
+	if filter == nil {
+		return nil, fmt.Errorf("error: no ID passed")
+	}
+	if filter != nil {
+		// apply the ID filter
+		query += " WHERE id=" + strconv.Itoa(int(filter.Id))
+	}
+
+	rows, err := r.db.Query(query, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	events, err := r.scanEvents(rows)
+	if err != nil {
+		return nil, err
+	}
+
+	// since we are expecting only 1 row, so choose the first one
+	return events[0], nil
 }
 
 func (r *sportsRepo) applyFilter(query string, filter *sports.ListEventsRequestFilter) (string, []interface{}) {
@@ -100,7 +135,7 @@ func (r *sportsRepo) applyFilter(query string, filter *sports.ListEventsRequestF
 	return query, args
 }
 
-func (m *sportsRepo) scanRaces(
+func (m *sportsRepo) scanEvents(
 	rows *sql.Rows,
 ) ([]*sports.Event, error) {
 	var events []*sports.Event
