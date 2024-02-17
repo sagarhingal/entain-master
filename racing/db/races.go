@@ -2,6 +2,8 @@ package db
 
 import (
 	"database/sql"
+	"fmt"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -19,6 +21,9 @@ type RacesRepo interface {
 
 	// List will return a list of races.
 	List(filter *racing.ListRacesRequestFilter) ([]*racing.Race, error)
+
+	// Get will return a single race based on the given ID.
+	Get(filter *racing.GetRaceRequest) (*racing.Race, error)
 }
 
 type racesRepo struct {
@@ -60,6 +65,36 @@ func (r *racesRepo) List(filter *racing.ListRacesRequestFilter) ([]*racing.Race,
 	}
 
 	return r.scanRaces(rows)
+}
+
+func (r *racesRepo) Get(filter *racing.GetRaceRequest) (*racing.Race, error) {
+	var (
+		err   error
+		query string
+	)
+
+	query = getRaceQueries()[racesList]
+
+	if filter == nil {
+		return nil, fmt.Errorf("error: no ID passed")
+	}
+	if filter != nil {
+		// apply the ID filter
+		query += " WHERE id=" + strconv.Itoa(int(filter.Id))
+	}
+
+	rows, err := r.db.Query(query, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	races, err := r.scanRaces(rows)
+	if err != nil {
+		return nil, err
+	}
+
+	// since we are expecting only 1 row, so choose the first one
+	return races[0], nil
 }
 
 func (r *racesRepo) applyFilter(query string, filter *racing.ListRacesRequestFilter) (string, []interface{}) {
