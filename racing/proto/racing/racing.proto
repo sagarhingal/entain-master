@@ -23,7 +23,14 @@ message ListRacesResponse {
 
 // Filter for listing races.
 message ListRacesRequestFilter {
+  enum STATUS {
+    UNDEFINED = 0;
+    VISIBILE = 1;
+    HIDDEN = 2;
+  }
+
   repeated int64 meeting_ids = 1;
+  STATUS visibility = 2;
 }
 
 /* Resources */
