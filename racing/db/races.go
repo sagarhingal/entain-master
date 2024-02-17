@@ -97,12 +97,12 @@ func (r *racesRepo) applyFilter(query string, filter *racing.ListRacesRequestFil
 			filter.SortBy == "meeting_id" || filter.SortBy == "name" {
 			sortCondition := " ORDER BY " + filter.SortBy
 			query += sortCondition
+
+			if filter.OrderBy == 1 {
+				query += " DESC"
+			} // note - we don't need to check for 0 since by default the sort order is ASC
 		}
 	}
-
-	if filter.OrderBy == 1 {
-		query += " DESC"
-	} // note - we don't need to check for 0 since by default the sort order is ASC
 
 	return query, args
 }
