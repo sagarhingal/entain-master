@@ -26,6 +26,10 @@ message ListRacesResponse {
 }
 
 // Filter for listing races.
+// ListRacesRequestFilter:
+// e.g visibility = 1 (VISIBLE)
+// e.g sortby = "advertised_start_time"
+// e.g orderby = 1 (desc)
 message ListRacesRequestFilter {
   enum STATUS {
     UNDEFINED = 0;
@@ -35,6 +39,8 @@ message ListRacesRequestFilter {
 
   repeated int64 meeting_ids = 1;
   STATUS visibility = 2;
+  string sort_by = 3;
+  int32 order_by = 4;
 }
 
 /* Resources */
