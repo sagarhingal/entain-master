@@ -117,6 +117,7 @@ func (x *ListEventsResponse) GetEvents() []*Event {
 	return nil
 }
 
+// Request to GetRequest call.
 type GetEventRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

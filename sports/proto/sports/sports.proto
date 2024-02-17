@@ -24,6 +24,7 @@ message ListEventsResponse {
   repeated Event events = 1;
 }
 
+// Request to GetRequest call.
 message GetEventRequest {
   int32 id = 1;
 }

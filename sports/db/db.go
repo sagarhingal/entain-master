@@ -10,6 +10,7 @@ import (
 // Sport represents a type of sport
 type Sport string
 
+// Sample sports types
 const (
 	Football   Sport = "Football"
 	Basketball Sport = "Basketball"
@@ -44,7 +45,7 @@ func (r *sportsRepo) seed() error {
 	return err
 }
 
-// Seed generates a random type of sport
+// generateSportType chooses a random type of sport based on the given list of options
 func generateSportType() Sport {
 	source := rand.NewSource(time.Now().UnixNano())
 	rng := rand.New(source)

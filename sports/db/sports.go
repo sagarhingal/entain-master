@@ -35,7 +35,7 @@ func NewSportsRepo(db *sql.DB) SportsRepo {
 	return &sportsRepo{db: db}
 }
 
-// Init prepares the race repository dummy data.
+// Init prepares the sports repository dummy data.
 func (r *sportsRepo) Init() error {
 	var err error
 
@@ -157,6 +157,7 @@ func (m *sportsRepo) scanEvents(
 			return nil, err
 		}
 
+		// calculate whether an event is OPEN or CLOSED based on it's existence in the past or the future
 		event.AdvertisedStartTime = ts
 		if event.AdvertisedStartTime.AsTime().Before(time.Now()) {
 			event.Status = "CLOSED"

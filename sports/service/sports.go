@@ -8,19 +8,19 @@ import (
 )
 
 type Sports interface {
-	// ListEvents will return a collection of races.
+	// ListEvents will return a collection of events.
 	ListEvents(ctx context.Context, in *sports.ListEventsRequest) (*sports.ListEventsResponse, error)
 
 	// GetEvent will return a single event based on the given ID.
 	GetEvent(ctx context.Context, in *sports.GetEventRequest) (*sports.Event, error)
 }
 
-// sportsService implements the Racing interface.
+// sportsService implements the Sports interface.
 type sportsService struct {
 	sportsRepo db.SportsRepo
 }
 
-// NewSportsService instantiates and returns a new racingService.
+// NewSportsService instantiates and returns a new sportsService.
 func NewSportsService(sportsRepo db.SportsRepo) Sports {
 	return &sportsService{sportsRepo}
 }
